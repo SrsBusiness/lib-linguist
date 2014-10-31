@@ -33,11 +33,19 @@ Format:
 Regular Expressions:
 
 All alphabet symbols are regular expressions.
+
 The empty string ("") is a regular expression.
+
 The null set (NULL) is a regular expression.
+
 AB is a regular expression if A and B are regular expressions. This is concatenation.
+
 A | B is a regular expression if A and B are regular expressions. This is the or operator.
+
 ~A is a regular expression if A is a regular expression. This is complement/negation.
+
 (A) is a regular expression if A is a regular expression.
+
 A\* is a regular expression if A is a regular expression. This is the Kleene star operation.
+
 A+ is a regular expression if A is a regular expression. This is equivalent to AA\*
