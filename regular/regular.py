@@ -94,7 +94,7 @@ def eps(q, trans):
             unvisited.update([x for x in r if not x in visited])
     return frozenset(result)
 
-def reduce(dfsm):
+def minimize(dfsm):
     return
 
 if __name__ == "__main__":
