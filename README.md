@@ -19,14 +19,14 @@ Accepting States is just the set of accepting states.
 
 Format:
 {
-    "alphabet":['a', 'b', 'c', ...]
-    "states": 4
+    "alphabet":['a', 'b', 'c', ...],
+    "states": 4,
     "trans": {
-        "<0>, a":"<1>"
-        "<0>, b":"<0>"
-        "<1>, c":"<2>"
+        "<0>, a":"<1>",
+        "<0>, b":"<0>",
+        "<1>, c":"<2>",
         ...
-    }
+    },
     "accept":[2, 3]
 }
 
