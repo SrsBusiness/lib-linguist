@@ -95,7 +95,86 @@ def eps(q, trans):
     return frozenset(result)
 
 def minimize(dfsm):
-    return
+    states = dfsm[STATES]
+    state_to_class = {}
+    accept = frozenset(dfsm[ACCEPT])
+    non_accept = frozenset([x for x in range(states) if x not in
+        dfsm[ACCEPT]])
+    classes = {accept, non_accept}
+
+    # map old states to equivalence classes
+    for state in range(states):
+        if state in accept:
+            state_to_class[frozenset({state})] = accept
+        else:
+            state_to_class[frozenset({state})] = non_accept
+
+    oldsize = len(classes)
+    trans = dfsm[TRANS]
+    while classes:
+        #print(classes)
+        # loop condition
+        newclasses = {}
+
+        # for each class in clases, split it if necessary
+        # {(c,1), (c, 2), (c, 3)}
+        for Q in classes:
+            for q in Q:
+                next_states = set()
+                for c in dfsm[ALPHABET]:
+                    p = trans[(q, c)]
+                    # map char with equivalence class
+                    #print(type(p))
+                    #print(type(state_to_class))
+                    next_states.add((c, state_to_class[frozenset(p)]))
+                next_states_froze = frozenset(next_states)
+                if next_states_froze not in newclasses:
+                    newclasses[next_states_froze] = {q}
+                else:
+                    newclasses[next_states_froze].add(q)
+        # newclasses now maps equivalence classes to q
+        # each equivalence class is a set of states
+        # and each q is a set of states
+
+        # create new set of equivalence classes
+        classes = set()
+        for e in newclasses:
+            classes.add(frozenset(newclasses[e]))
+
+        # remap states to equivalence classes
+        state_to_class = {}
+        for e in classes:
+            for q in e:
+                state_to_class[frozenset({q})] = e
+
+        if oldsize == len(classes):
+            break
+        oldsize = len(classes)
+
+    # enumerate classes
+    enum = {}
+    i = 0
+    for e in classes:
+        enum[e] = i
+        i += 1
+
+    # compute new transitions
+    new_trans = {}
+    for e in classes:
+        for c in dfsm[ALPHABET]:
+            for q in e:
+                if (q, c) in trans:
+                    new_trans[(enum[e], c)] =\
+                    {enum[state_to_class[frozenset(trans[(q, c)])]]}
+                    break;
+    new_accept = set()
+    for e in classes:
+        if e.intersection(accept):
+            new_accept.add(enum[e])
+    #print(new_accept)
+    #print(enum)
+    #print(new_trans)
+    return (i, dfsm[ALPHABET], new_trans, new_accept)
 
 if __name__ == "__main__":
     m = (9, {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'}, {
@@ -157,10 +236,18 @@ if __name__ == "__main__":
         (8, 'f') : {8},
         (8, 'g') : {8},
         }, {0, 1, 2, 3, 4, 5, 6, 7, 8})
-    print('NDFSM')
-    print(m)
-    print()
-    print('DFSM')
+    #print('NDFSM')
+    #print(m)
+    #print()
+    #print('DFSM')
+    #print(ndfsm_to_dfsm(m))
+    #minimize(ndfsm_to_dfsm(m))
+    #m = (3, {'a', 'b'}, {(0, 'a'):{1}, (0, 'b'):{1}, (1, 'a'):{2},
+    #    (1, 'b'):{2}, (2, 'a'):{1}, (2, 'b'):{1}}, {0, 2})
+    n = (4, {'a', 'b'}, {(0, 'a'):{1}, (0, 'b'):{2}, (1, 'a'):{3},
+        (1, 'b'):{3}, (2, 'a'):{1}, (2, 'b'):{2}, (3, 'a'):{3}, (3, 'b'):{3}},
+        {1, 3})
+    #minimize(m)
     print(ndfsm_to_dfsm(m))
 
 
