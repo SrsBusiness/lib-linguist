@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 from json import *
+from test import *
 
 # { "alphabet"  :   Set(['a', b', 'c']),
 #   "states"    :   5,
@@ -121,26 +122,20 @@ def minimize(dfsm):
     oldsize = len(classes)
     trans = dfsm[TRANS]
     while classes:
-        #print(classes)
-        # loop condition
         newclasses = {}
-
-        # for each class in clases, split it if necessary
-        # {(c,1), (c, 2), (c, 3)}
         for Q in classes:
+            newclasses[Q] = dict()
             for q in Q:
                 next_states = set()
                 for c in dfsm[ALPHABET]:
                     p = trans[(q, c)]
                     # map char with equivalence class
-                    #print(type(p))
-                    #print(type(state_to_class))
                     next_states.add((c, state_to_class[frozenset(p)]))
                 next_states_froze = frozenset(next_states)
-                if next_states_froze not in newclasses:
-                    newclasses[next_states_froze] = {q}
+                if next_states_froze not in newclasses[Q]:
+                    newclasses[Q][next_states_froze] = {q}
                 else:
-                    newclasses[next_states_froze].add(q)
+                    newclasses[Q][next_states_froze].add(q)
         # newclasses now maps equivalence classes to q
         # each equivalence class is a set of states
         # and each q is a set of states
@@ -148,7 +143,8 @@ def minimize(dfsm):
         # create new set of equivalence classes
         classes = set()
         for e in newclasses:
-            classes.add(frozenset(newclasses[e]))
+            for f in newclasses[e]:
+                classes.add(frozenset(newclasses[e][f]))
 
         # remap states to equivalence classes
         state_to_class = {}
@@ -162,11 +158,14 @@ def minimize(dfsm):
 
     # enumerate classes
     enum = {}
-    i = 0
+    size = len(classes)
+    i = size - 1
     for e in classes:
-        enum[e] = i
-        i += 1
-
+        if 0 in e:
+            enum[e] = 0
+        else:
+            enum[e] = i
+            i -= 1
     # compute new transitions
     new_trans = {}
     for e in classes:
@@ -180,10 +179,26 @@ def minimize(dfsm):
     for e in classes:
         if e.intersection(accept):
             new_accept.add(enum[e])
-    #print(new_accept)
-    #print(enum)
-    #print(new_trans)
-    return (i, dfsm[ALPHABET], new_trans, new_accept)
+    return (size, dfsm[ALPHABET], new_trans, new_accept)
+
+def equivalence_slow(fsm1, fsm2):
+    if fsm1[ALPHABET] != fsm2[ALPHABET]:
+        return false
+    maxstates = max(fsm1[STATES], fsm2[STATES])
+    for i in range(maxstates):
+        if not equivalence_slow_recurse(fsm1, fsm2, '', i + 1):
+            return false
+        print("Passed for all strings of length " + str(i))
+    return true
+
+def equivalence_slow_recurse(fsm1, fsm2, inputstr, level):
+    if level <= 0:
+        return simulate(fsm1, inputstr) == simulate(fsm2, inputstr)
+    for c in fsm1[ALPHABET]:
+        if not equivalence_slow_recurse(fsm1, fsm2, inputstr + c, level - 1):
+            return False
+    return True
+
 
 if __name__ == "__main__":
     m = (9, {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'}, {
@@ -257,6 +272,8 @@ if __name__ == "__main__":
         (1, 'b'):{3}, (2, 'a'):{1}, (2, 'b'):{2}, (3, 'a'):{3}, (3, 'b'):{3}},
         {1, 3})
     #minimize(m)
-    print(ndfsm_to_dfsm(m))
+    a = minimize(minimize_test)
+    print(a)
+    equivalence_slow(a, minimize_test)
 
 
