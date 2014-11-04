@@ -16,8 +16,17 @@ ALPHABET = 1
 TRANS = 2
 ACCEPT = 3
 
-def simulate(ndfsm):
-    return
+def simulate(dfsm, stream):
+    state = 0
+    for x in stream:
+        query = (state, x)
+        if query in dfsm[TRANS]:
+            # FIXME: dfsm should be represented differently
+            result = dfsm[TRANS][query]
+            if result: state = list(result)[0]
+        else:
+            return False
+    return state in dfsm[ACCEPT]
 
 def json_to_ndfsm(json_fsm):
     return
