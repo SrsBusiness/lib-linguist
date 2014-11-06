@@ -3,15 +3,6 @@
 from json import *
 from test import *
 
-# { "alphabet"  :   Set(['a', b', 'c']),
-#   "states"    :   5,
-#   "trans"     :   {   
-#                       (0, 'c')    :   [0, 1]
-#                       ...
-#                   },
-#   "accept"    :   Set([2, 3])
-# }
-
 STATES = 0
 ALPHABET = 1
 TRANS = 2
@@ -31,6 +22,10 @@ def simulate(dfsm, stream):
 
 def json_to_ndfsm(json_fsm):
     return
+
+# regular expressions are a context free grammar, so this will be postponed
+# until CFG parsing is implemented
+def regex_to_dfsm(regex):
 
 def ndfsm_to_dfsm(ndfsm):
     #compute eps of each state in ndfsm
@@ -260,6 +255,9 @@ if __name__ == "__main__":
         (8, 'f') : {8},
         (8, 'g') : {8},
         }, {0, 1, 2, 3, 4, 5, 6, 7, 8})
+    minfsm = minimize(ndfsm_to_dfsm(m))
+    while True:
+        print(simulate(minfsm, input()))
     #print('NDFSM')
     #print(m)
     #print()
@@ -268,12 +266,12 @@ if __name__ == "__main__":
     #minimize(ndfsm_to_dfsm(m))
     #m = (3, {'a', 'b'}, {(0, 'a'):{1}, (0, 'b'):{1}, (1, 'a'):{2},
     #    (1, 'b'):{2}, (2, 'a'):{1}, (2, 'b'):{1}}, {0, 2})
-    n = (4, {'a', 'b'}, {(0, 'a'):{1}, (0, 'b'):{2}, (1, 'a'):{3},
-        (1, 'b'):{3}, (2, 'a'):{1}, (2, 'b'):{2}, (3, 'a'):{3}, (3, 'b'):{3}},
-        {1, 3})
+    #n = (4, {'a', 'b'}, {(0, 'a'):{1}, (0, 'b'):{2}, (1, 'a'):{3},
+    #    (1, 'b'):{3}, (2, 'a'):{1}, (2, 'b'):{2}, (3, 'a'):{3}, (3, 'b'):{3}},
+    #    {1, 3})
     #minimize(m)
-    a = minimize(minimize_test)
-    print(a)
-    equivalence_slow(a, minimize_test)
+    #a = minimize(minimize_test)
+    #print(a)
+    #equivalence_slow(a, minimize_test)
 
 
